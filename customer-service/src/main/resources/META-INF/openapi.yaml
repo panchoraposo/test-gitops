@@ -1,0 +1,167 @@
+openapi: 3.0.3
+info:
+  title: NeuralBank Customer Service API
+  version: 1.0.0
+  description: |
+    Microservicio de gestión de clientes para NeuralBank.
+    
+    Este servicio proporciona operaciones CRUD completas para la gestión de clientes,
+    incluyendo scoring crediticio, validaciones, búsquedas avanzadas y gestión de metadata.
+    
+    ## Características principales:
+    - Creación y gestión de clientes (Personal, Empresarial, Corporativo)
+    - Validación de identificaciones internacionales (SSN, RFC, CURP, CPF, RUT, etc.)
+    - Cálculo automático de score crediticio
+    - Búsqueda y filtrado avanzado
+    - Gestión de metadata flexible con JSONB
+    - Soporte multi-país y multi-moneda
+    
+  contact:
+    name: NeuralBank Development Team
+    email: dev@neuralbank.com
+    url: https://neuralbank.com
+  license:
+    name: Proprietary
+    url: https://neuralbank.com/license
+
+servers:
+  - url: http://localhost:8080
+    description: Development server
+  - url: https://api-dev.neuralbank.com
+    description: Development environment
+  - url: https://api.neuralbank.com
+    description: Production environment
+
+tags:
+  - name: Customer Management
+    description: Operaciones CRUD de clientes
+  - name: Customer Search
+    description: Búsqueda y filtrado de clientes
+  - name: Credit Scoring
+    description: Gestión de score crediticio
+  - name: Customer Status
+    description: Activación, desactivación y bloqueo de clientes
+  - name: Customer Data
+    description: Actualización de datos específicos (email, teléfono, dirección)
+  - name: Metadata
+    description: Gestión de metadata flexible
+
+components:
+  schemas:
+    CustomerType:
+      type: string
+      enum:
+        - PERSONAL
+        - EMPRESARIAL
+        - CORPORATIVO
+      description: Tipo de cliente
+      
+    RiskLevel:
+      type: string
+      enum:
+        - Bajo
+        - Medio
+        - Alto
+        - Muy Alto
+      description: Nivel de riesgo del cliente
+      
+    IdentificationType:
+      type: string
+      enum:
+        - DNI
+        - PASSPORT
+        - SSN
+        - RFC
+        - CURP
+        - CPF
+        - CUIT
+        - RUT
+        - RUN
+        - NINO
+        - CIF
+        - EIN
+        - TAX_ID
+      description: Tipo de documento de identificación
+      
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token de autenticación
+      
+  responses:
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Cliente no encontrado
+              status:
+                type: integer
+                example: 404
+              timestamp:
+                type: string
+                format: date-time
+                
+    BadRequest:
+      description: Solicitud inválida
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Datos de cliente inválidos
+              status:
+                type: integer
+                example: 400
+              timestamp:
+                type: string
+                format: date-time
+              errors:
+                type: array
+                items:
+                  type: string
+                  
+    Conflict:
+      description: Conflicto - recurso duplicado
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Cliente con identificación XXX ya existe
+              status:
+                type: integer
+                example: 409
+              timestamp:
+                type: string
+                format: date-time
+                
+    InternalServerError:
+      description: Error interno del servidor
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Error interno del servidor
+              status:
+                type: integer
+                example: 500
+              timestamp:
+                type: string
+                format: date-time
+
+security:
+  - bearerAuth: []
